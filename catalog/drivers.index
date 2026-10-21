@@ -1,0 +1,3 @@
+# Каталог драйверов Linux для Quadrix OS
+org.quadrix.driver.8139too	0.1.0	Драйвер Linux 8139too	Linux driver 8139too	org.quadrix.driver.8139too-0.1.0.qdrv	10ec:8139,10ec:8138,1113:1211,1500:1360,4033:1360,1186:1300,1186:1340,13d1:ab06,1259:a117,1259:a11e,14ea:ab06,14ea:ab07,11db:1234,1432:9130,02ac:1012,018a:0106,126c:1211,1743:8139,021b:8139,16ec:ab06,*:8139,*:8139,*:8139	Realtek RTL8139, RTL8129 и совместимые (до RTL8139C)
+org.quadrix.driver.8139cp	0.1.0	Драйвер Linux 8139cp	Linux driver 8139cp	org.quadrix.driver.8139cp-0.1.0.qdrv	10ec:8139,0357:000a	Realtek RTL8139C+ (в том числе карта QEMU rtl8139)
