@@ -22,8 +22,17 @@
 Пакеты подписаны ключом каталога; его открытая часть входит в доверенные
 ключи Quadrix OS (`/system/etc/trusted-keys`).
 
-Релизы публикует GitHub Actions из репозитория Quadrix OS (workflow
-«Каталог драйверов», метка `drivers-<версия>`).
+## Как выпустить новую версию
+
+1. В репозитории Quadrix OS собрать и подписать каталог ключом каталога:
+   `QX_DRIVERS_SEED=<секрет> QX_DRIVERS_VERSION=<версия> cargo xtask drivers`.
+2. Скопировать `target/quadrix/drivers/*` в `catalog/`, записать версию в
+   `catalog/VERSION`, закоммитить и запушить в `main`.
+3. Workflow «Релиз каталога» сам опубликует релиз `v<версия>`
+   (собственный токен репозитория, секреты не нужны).
+
+Другой путь — workflow «Каталог драйверов» в Quadrix OS (метка
+`drivers-<версия>`, секреты `QX_DRIVERS_SEED` и `DRIVERS_TOKEN`).
 
 ## Лицензия
 
