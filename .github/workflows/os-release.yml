@@ -1,0 +1,58 @@
+name: Выпуск Quadrix OS
+
+# Выпуски самой системы лежат в os/: образ ISO, его SHA-256, update.index
+# (по нему установленные системы ищут обновление) и, если есть, подписанный
+# пакет обновления quadrix-update-<версия>.qup. При изменении os/VERSION
+# публикуются:
+#   os-<версия> — все файлы выпуска;
+#   os-latest   — update.index и .qup: Quadrix OS читает
+#                 …/releases/download/os-latest/update.index.
+# Оба выпуска — с --latest=false: «последним» остаётся каталог драйверов
+# (…/releases/latest/download/drivers.index).
+
+on:
+  push:
+    branches: [main]
+    paths: ['os/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: os-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Выпуск
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd os
+          V="$(tr -d '[:space:]' < VERSION)"
+          test -f "quadrix-$V.iso" || { echo "нет os/quadrix-$V.iso"; exit 1; }
+          sha256sum -c "quadrix-$V.iso.sha256"
+          FILES="quadrix-$V.iso quadrix-$V.iso.sha256 update.index"
+          LATEST="update.index"
+          if [ -f "quadrix-update-$V.qup" ]; then
+            FILES="$FILES quadrix-update-$V.qup"
+            LATEST="$LATEST quadrix-update-$V.qup"
+          fi
+          if gh release view "os-$V" >/dev/null 2>&1; then
+            gh release upload "os-$V" $FILES --clobber
+          else
+            gh release create "os-$V" $FILES \
+              --title "Quadrix OS $V" \
+              --notes-file notes.md \
+              --latest=false
+          fi
+          # os-latest пересоздаётся: метка переезжает на новый выпуск
+          gh release delete os-latest --yes --cleanup-tag 2>/dev/null || true
+          gh release create os-latest $LATEST \
+            --title "Quadrix OS — последняя версия ($V)" \
+            --notes-file notes.md \
+            --latest=false
